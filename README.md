@@ -96,6 +96,7 @@ stories/
 docs/
   STORY-GUIDE.md         how to write a story
   BRIEF-TEMPLATE.md      a brief for an AI assistant
+LICENSE                  the MIT licence
 ```
 
 ## The example story
@@ -105,6 +106,8 @@ distributor, told in three acts and an end roll. It is an illustrative reconstru
 dates, figures and clause wording are fictional. It uses every piece in the table above and adds
 drawings and one mechanism of its own, so it is the place to look when the starter is too small.
 
+You can play it at https://group-7-game-mediation.vercel.app
+
 ## Limits
 
 - The screen is 192 by 108 pixels and the text box holds two short lines. Long passages do not fit.
@@ -113,3 +116,11 @@ drawings and one mechanism of its own, so it is the place to look when the start
 - The engine's own menu words are in English.
 - Every colour is cool-toned by rule. The builder rejects a colour whose red is not below its blue.
 - A room is one screen. There is no scrolling map.
+
+## Licence
+
+MIT. See `LICENSE`. You may use, change and share the engine, the tools, the starter story and the
+two pixel fonts, which were drawn for this project, as long as you keep the copyright notice.
+
+The words of the example story in `stories/baltic-nusantara` are Group 7's coursework. They are
+here to show how a story is written. Write your own case in your own words.
