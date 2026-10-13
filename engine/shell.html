@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="@@LANG@@">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>@@TITLE@@</title>
+<style>
+:root { --ground: #EFF3F9; --card: #FFFFFF; --ink: #141B33; --soft: #465A8C; --line: #CDD8EE; --shell: #141B33; --bezel: #0A1030; --key: #232D52; --keyline: #2E3D66; --lit: #E9EFF9; --blue: #1F5FD6; --teal: #0D7384; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 20px 16px 48px; }
+.top { max-width: 720px; margin: 0 auto 12px; text-align: center; }
+.kicker { margin: 0 0 4px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+h1 { margin: 0 0 6px; font-size: clamp(22px, 3.2vw, 30px); line-height: 1.2; letter-spacing: -.01em; }
+.lede { max-width: 720px; margin: 16px auto 0; color: var(--soft); text-align: center; }
+kbd { font: 600 13px/1 ui-monospace, "SF Mono", Menlo, monospace; background: var(--card); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 2px 6px; color: var(--ink); white-space: nowrap; }
+
+.console { width: fit-content; max-width: 100%; margin: 0 auto; background: var(--shell); border-radius: 22px; padding: 14px 14px 12px; box-shadow: 0 18px 40px rgba(20, 27, 51, .22), 0 2px 0 rgba(255, 255, 255, .06) inset; }
+.screen { background: var(--bezel); border-radius: 12px; padding: 8px; display: flex; justify-content: center; }
+canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 4px; outline: none; touch-action: manipulation; cursor: pointer; }
+canvas:focus-visible { box-shadow: 0 0 0 3px #6F9BF0; }
+.pad { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 6px 2px; }
+.pad button { font: 600 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--lit); background: var(--key); border: 1px solid var(--keyline); border-radius: 12px; min-width: 44px; min-height: 44px; padding: 0 12px; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; }
+.pad button:active, .pad button.on { background: #2E3D66; transform: translateY(1px); }
+.pad button:focus-visible { outline: 3px solid #6F9BF0; outline-offset: 2px; }
+.dpad { display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 2px; }
+.dpad button { padding: 0; font-size: 16px; }
+.dpad .u { grid-area: 1 / 2; } .dpad .l { grid-area: 2 / 1; } .dpad .r { grid-area: 2 / 3; } .dpad .d { grid-area: 3 / 2; }
+.mid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.mid button { border-radius: 999px; }
+.ab { display: flex; gap: 10px; align-items: center; }
+.ab button { width: 56px; height: 56px; border-radius: 50%; font-size: 17px; }
+.ab .a { background: var(--blue); border-color: #6F9BF0; }
+.ab .b { margin-top: 22px; }
+.console:fullscreen { width: 100vw; height: 100vh; max-width: none; border-radius: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bezel); }
+.console:fullscreen .screen { padding: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .console:fullscreen .pad { display: none; }
+  .pad { padding-top: 10px; }
+  .dpad { grid-template-columns: repeat(4, 40px); grid-template-rows: 40px; }
+  .dpad .l { grid-area: 1 / 1; } .dpad .u { grid-area: 1 / 2; } .dpad .d { grid-area: 1 / 3; } .dpad .r { grid-area: 1 / 4; }
+  .pad button { min-width: 40px; min-height: 40px; }
+  .ab button { width: 44px; height: 44px; } .ab .b { margin-top: 0; }
+}
+
+.keys { max-width: 880px; margin: 12px auto 0; display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; color: var(--soft); font-size: 14px; padding: 0; list-style: none; }
+.panel { max-width: 760px; margin: 22px auto 0; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 20px; box-shadow: 0 1px 2px rgba(20, 27, 51, .05); }
+.panel summary { cursor: pointer; font-weight: 650; padding: 12px 0; }
+.panel summary:focus-visible { outline: 3px solid #6F9BF0; outline-offset: 4px; border-radius: 6px; }
+.panel h2 { font-size: 17px; margin: 18px 0 6px; }
+.panel p { margin: 0 0 8px; }
+.panel .who { font-weight: 650; color: var(--teal); }
+.panel .choice { color: var(--soft); border-left: 3px solid var(--line); padding-left: 10px; }
+.panel .card { color: var(--soft); font-size: 14px; letter-spacing: .02em; }
+.panel .q { font-weight: 650; color: var(--blue); margin-top: 14px; }
+.foot { max-width: 760px; margin: 20px auto 0; color: var(--soft); font-size: 14px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 560px) {
+  .wrap { padding: 12px 8px 40px; } .console { border-radius: 16px; padding: 8px 8px 10px; } .screen { padding: 4px; border-radius: 8px; }
+  .pad { flex-wrap: wrap; padding: 12px 10px 4px; } .mid { order: 3; flex-basis: 100%; padding-top: 4px; } .mid button { min-height: 40px; padding: 0 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .pad button:active { transform: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+<!--@@KICKER@@-->    <h1>@@TITLE@@</h1>
+  </header>
+
+  <section class="console" id="console" aria-label="The game">
+    <div class="screen"><canvas id="screen" width="192" height="150" tabindex="0" role="img" aria-label="Game screen. Every line of text shown on it is also announced, and the whole story is written out below."></canvas></div>
+    <div class="pad">
+      <div class="dpad" role="group" aria-label="Direction">
+        <button class="u" data-hold="up" aria-label="Up">&#9650;</button><button class="l" data-hold="left" aria-label="Left">&#9664;</button><button class="r" data-hold="right" aria-label="Right">&#9654;</button><button class="d" data-hold="down" aria-label="Down">&#9660;</button>
+      </div>
+      <div class="mid">
+        <button data-tap="next" aria-label="Play the next step on the record">N: record</button>
+        <button id="b-auto" aria-label="Auto play: off, moves or full">Auto: off</button>
+        <button data-tap="start">Menu</button>
+        <button id="b-sound" aria-pressed="true">Sound on</button>
+        <button id="b-full">Full screen</button>
+      </div>
+      <div class="ab"><button class="b" data-hold="b" aria-label="B, fast forward">B</button><button class="a" data-tap="a" aria-label="A, talk or confirm">A</button></div>
+    </div>
+  </section>
+  <p id="live" class="vh" aria-live="polite"></p>
+
+<!--@@LEDE@@--><!--@@KEYS-BEGIN@@-->
+  <ul class="keys" aria-label="Keys">
+    <li><kbd>&larr;</kbd> <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&rarr;</kbd> walk and choose</li>
+    <li><kbd>Enter</kbd> or <kbd>Space</kbd> talk and confirm</li>
+    <li><kbd>N</kbd> the next step on the record</li>
+    <li><kbd>T</kbd> auto play: off, moves (it walks, you press Enter), full (it plays itself)</li>
+    <li><kbd>Esc</kbd> menu and chapters</li>
+    <li><kbd>F</kbd> full screen</li>
+    <li><kbd>M</kbd> sound</li>
+  </ul>
+<!--@@KEYS-END@@-->
+
+  <details class="panel">
+    <summary>The story as text</summary>
+<!--@@TRANSCRIPT@@-->
+  </details>
+
+<!--@@FOOT@@--></main>
+
+<script type="application/json" id="font">/*@@FONT@@*/</script>
+<script>
+/*@@ENGINE@@*/
+/*@@KIT@@*/
+/*@@QR@@*/
+/*@@GAME@@*/
+G.init(JSON.parse(document.getElementById('font').textContent));
+/*@@STORY@@*/
+</script>
+<script>
+(function () {
+  var cv = document.getElementById('screen'), ctx = cv.getContext('2d'), img = ctx.createImageData(G.FW, G.FH), out = new Uint32Array(img.data.buffer);
+  var con = document.getElementById('console'), live = document.getElementById('live'), bSound = document.getElementById('b-sound'), S = G.S;
+  var SOUND_KEY = 'pixel-case-' + (G.cfg().id || 'story') + '-sound';                // where the page remembers the sound setting
+  try { if (localStorage.getItem(SOUND_KEY) === 'off') S.sound = false; } catch (e) {}
+  var rm = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null; S.reduced = !!(rm && rm.matches);
+
+  // ---------------------------------------------------------------- sound: a few square waves, made here
+  var AC = null;
+  function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+  function tone(f0, f1, d, vol, type, at) {
+    var t = AC.currentTime + (at || 0), o = AC.createOscillator(), g = AC.createGain(); o.type = type || 'square';
+    o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + d);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + 0.02);
+  }
+  function hiss(d, vol) {
+    var n = Math.floor(AC.sampleRate * d), buf = AC.createBuffer(1, n, AC.sampleRate), ch = buf.getChannelData(0); for (var i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    var s = AC.createBufferSource(), g = AC.createGain(); s.buffer = buf; g.gain.value = vol; s.connect(g); g.connect(AC.destination); s.start();
+  }
+  G.hooks.sfx = function (name) {
+    if (!S.sound || !AC || AC.state !== 'running') return;
+    switch (name) {
+      case 'tick': tone(1180, 0, 0.012, 0.012); break;
+      case 'next': tone(620, 820, 0.05, 0.03); break;
+      case 'move': tone(520, 0, 0.035, 0.03); break;
+      case 'ok': tone(700, 0, 0.05, 0.035); tone(1050, 0, 0.08, 0.035, 'square', 0.05); break;
+      case 'no': tone(150, 110, 0.18, 0.05, 'sawtooth'); break;
+      case 'pop': tone(880, 1320, 0.06, 0.035); break;
+      case 'throw': tone(380, 920, 0.2, 0.03, 'triangle'); break;
+      case 'throw2': tone(520, 180, 0.24, 0.04, 'triangle'); break;
+      case 'hit': hiss(0.12, 0.08); break;
+      case 'hit2': hiss(0.2, 0.11); tone(110, 60, 0.2, 0.06); break;
+      case 'down': tone(520, 190, 0.5, 0.03, 'triangle'); break;
+      case 'up': tone(300, 720, 0.4, 0.03, 'triangle'); break;
+      case 'count': tone(300, 900, 0.7, 0.02, 'triangle'); break;
+      case 'ring': tone(1320, 0, 0.09, 0.03); tone(1650, 0, 0.09, 0.03, 'square', 0.11); tone(1320, 0, 0.09, 0.03, 'square', 0.3); tone(1650, 0, 0.09, 0.03, 'square', 0.41); break;
+      case 'fight': tone(330, 0, 0.09, 0.04); tone(440, 0, 0.09, 0.04, 'square', 0.1); tone(554, 0, 0.09, 0.04, 'square', 0.2); tone(659, 0, 0.16, 0.04, 'square', 0.3); break;
+      case 'card': tone(523, 0, 0.12, 0.03, 'triangle'); tone(784, 0, 0.2, 0.03, 'triangle', 0.12); break;
+      case 'key': tone(784, 0, 0.08, 0.035); tone(988, 0, 0.08, 0.035, 'square', 0.08); tone(1175, 0, 0.16, 0.035, 'square', 0.16); break;
+    }
+  };
+  function soundLabel() { bSound.textContent = S.sound ? 'Sound on' : 'Sound off'; bSound.setAttribute('aria-pressed', S.sound ? 'true' : 'false'); }
+  var soundWas = S.sound; soundLabel();
+  var bAuto = document.getElementById('b-auto'), autoWas = -1;
+  function autoLabel() { bAuto.textContent = 'Auto: ' + G.AUTO[S.auto].toLowerCase(); }
+  function toggleSound() { S.sound = !S.sound; if (S.sound) audio(); }
+
+  // ---------------------------------------------------------------- what the screen says, for people who cannot see it
+  G.hooks.say = function (name, text) { live.textContent = (name ? name + ': ' : '') + text; };
+  G.hooks.menu = function (title, opts) { live.textContent = (title ? title + '. ' : '') + 'Choose: ' + opts.map(function (o, i) { return (i + 1) + ', ' + o; }).join('. ') + '.'; };
+
+  // ---------------------------------------------------------------- keys
+  var KEY = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+  function full() { if (document.fullscreenElement) document.exitFullscreen(); else if (con.requestFullscreen) con.requestFullscreen(); }
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var t = e.target, k = e.key;
+    if (t && t.closest && t.closest('button, summary, a, input, textarea, select') && (k === 'Enter' || k === ' ')) return;
+    audio();
+    if (KEY[k]) { G.down(KEY[k]); e.preventDefault(); return; }
+    if (k === 'Enter' || k === ' ' || k === 'z' || k === 'Z') { if (!e.repeat) G.tap('a'); e.preventDefault(); return; }
+    if (k === 'x' || k === 'X' || k === 'Backspace') { G.down('b'); e.preventDefault(); return; }
+    if (k === 'n' || k === 'N') { if (!e.repeat) G.tap('next'); return; }
+    if (k === 'Escape' || k === 'p' || k === 'P') { if (!document.fullscreenElement || k !== 'Escape') G.tap('start'); return; }
+    if (k === 'm' || k === 'M') { toggleSound(); return; }
+    if (k === 't' || k === 'T') { if (!e.repeat) G.cycleAuto(); return; }
+    if (k === 'f' || k === 'F') { full(); return; }
+    if (k >= '1' && k <= '5') G.pick(+k - 1);
+  });
+  document.addEventListener('keyup', function (e) { if (KEY[e.key]) G.up(KEY[e.key]); if (e.key === 'x' || e.key === 'X' || e.key === 'Backspace') G.up('b'); });
+  window.addEventListener('blur', function () { ['up', 'down', 'left', 'right', 'b'].forEach(G.up); });
+
+  // ---------------------------------------------------------------- buttons and the pointer
+  [].forEach.call(document.querySelectorAll('[data-hold]'), function (b) {
+    var k = b.getAttribute('data-hold');
+    b.addEventListener('pointerdown', function (e) { audio(); G.down(k); b.classList.add('on'); e.preventDefault(); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { b.addEventListener(ev, function () { G.up(k); b.classList.remove('on'); }); });
+    b.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { G.tap(k); e.preventDefault(); } });
+    b.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  });
+  [].forEach.call(document.querySelectorAll('[data-tap]'), function (b) { b.addEventListener('click', function () { audio(); G.tap(b.getAttribute('data-tap')); }); });
+  bSound.addEventListener('click', toggleSound);
+  bAuto.addEventListener('click', function () { audio(); G.cycleAuto(); });
+  document.getElementById('b-full').addEventListener('click', full);
+  cv.addEventListener('pointerdown', function (e) { var q = cv.getBoundingClientRect(); audio(); G.point((e.clientX - q.left) * G.FW / q.width, (e.clientY - q.top) * G.FH / q.height); e.preventDefault(); cv.focus({ preventScroll: true }); });
+
+  // ---------------------------------------------------------------- size: whole pixels wherever there is room for them
+  function fit() {
+    var fs = document.fullscreenElement === con, pad = con.querySelector('.pad'), padH = fs && getComputedStyle(pad).display === 'none' ? 0 : pad.offsetHeight + 24;
+    var availW = fs ? window.innerWidth : Math.min(document.documentElement.clientWidth - (window.innerWidth <= 560 ? 40 : 76), 1344);
+    var availH = fs ? window.innerHeight - padH : Math.max(225, window.innerHeight - padH - 96);
+    var sc = Math.min(availW / G.FW, availH / G.FH); if (sc >= 2) sc = Math.floor(sc); sc = Math.max(1, sc);
+    cv.style.width = Math.round(G.FW * sc) + 'px'; cv.style.height = Math.round(G.FH * sc) + 'px';
+  }
+  window.addEventListener('resize', fit); document.addEventListener('fullscreenchange', function () { fit(); cv.focus({ preventScroll: true }); }); fit();
+
+  // ---------------------------------------------------------------- chapters by link: #act-3 opens the third act, #act-3-2 its second part
+  function fromHash() { var q = G.fromHash(location.hash); if (q) G.start(q[0], q[1]); else G.start(); }
+  window.addEventListener('hashchange', fromHash); fromHash();
+
+  var lastT = 0;
+  function frame(now) {
+    var dt = lastT ? now - lastT : 16; lastT = now;
+    G.tick(dt); out.set(G.draw()); ctx.putImageData(img, 0, 0);
+    if (S.auto !== autoWas) { autoWas = S.auto; autoLabel(); }
+    if (S.sound !== soundWas) { soundWas = S.sound; soundLabel(); try { localStorage.setItem(SOUND_KEY, S.sound ? 'on' : 'off'); } catch (e) {} }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  window.GAME = { G: G, fit: fit };                                                     // for tests and for the curious
+})();
+</script>
+</body>
+</html>
